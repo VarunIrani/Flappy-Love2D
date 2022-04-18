@@ -31,85 +31,84 @@ local SKY_SPEED = 30
 local LAND_SPEED = 200
 
 function love.load()
-	math.randomseed(os.time())
+    math.randomseed(os.time())
 
-	love.graphics.setDefaultFilter("nearest", "nearest")
-	love.window.setTitle("Flappy Bird")
+    love.graphics.setDefaultFilter("nearest", "nearest")
+    love.window.setTitle("Flappy Bird")
 
-	titleFont = love.graphics.newFont("font.ttf", 92)
-	flappyFont = love.graphics.newFont("font.ttf", 48)
+    titleFont = love.graphics.newFont("font.ttf", 92)
+    flappyFont = love.graphics.newFont("font.ttf", 48)
 
-	love.graphics.setFont(flappyFont)
+    love.graphics.setFont(flappyFont)
 
-	sounds = {
-		["flap"] = love.audio.newSource(audio .. "Wing.wav", "static"),
-		["score"] = love.audio.newSource(audio .. "Point.wav", "static"),
-		["hit"] = love.audio.newSource(audio .. "Hit.wav", "static")
-	}
+    sounds = {
+        ["flap"] = love.audio.newSource(audio .. "Wing.wav", "static"),
+        ["score"] = love.audio.newSource(audio .. "Point.wav", "static"),
+        ["hit"] = love.audio.newSource(audio .. "Hit.wav", "static")
+    }
 
-	push:setupScreen(
-		VIRTUAL_WIDTH,
-		VIRTUAL_HEIGHT,
-		WINDOW_WIDTH,
-		WINDOW_HEIGHT,
-		{
-			vsync = true,
-			fullscreen = false,
-			resizable = false
-		}
-	)
+    push:setupScreen(
+            VIRTUAL_WIDTH,
+            VIRTUAL_HEIGHT,
+            WINDOW_WIDTH,
+            WINDOW_HEIGHT,
+            {
+                vsync = true,
+                fullscreen = false,
+                resizable = false
+            }
+    )
 
-	gStateMachine =
-		StateMachine {
-		["title"] = function()
-			return TitleScreenState()
-		end,
-		["countdown"] = function()
-			return CountDownState()
-		end,
-		["play"] = function()
-			return PlayState()
-		end,
-		["score"] = function()
-			return ScoreState()
-		end
-	}
+    gStateMachine = StateMachine {
+        ["title"] = function()
+            return TitleScreenState()
+        end,
+        ["countdown"] = function()
+            return CountDownState()
+        end,
+        ["play"] = function()
+            return PlayState()
+        end,
+        ["score"] = function()
+            return ScoreState()
+        end
+    }
 
-	gStateMachine:change("title")
+    gStateMachine:change("title")
 
-	love.keyboard.keysPressed = {}
+    love.keyboard.keysPressed = {}
 end
 
 function love.keypressed(key)
-	love.keyboard.keysPressed[key] = true
-	if key == "escape" then
-		love.event.quit()
-	end
+    love.keyboard.keysPressed[key] = true
+    if key == "escape" then
+        love.event.quit()
+    end
 end
 
 function love.keyboard.wasPressed(key)
-	return love.keyboard.keysPressed[key]
+    return love.keyboard.keysPressed[key]
 end
 
 function love.update(dt)
-	sky_scroll = (sky_scroll + SKY_SPEED * dt) % VIRTUAL_WIDTH
-	land_scroll = (land_scroll + LAND_SPEED * dt) % VIRTUAL_WIDTH
+    sky_scroll = (sky_scroll + SKY_SPEED * dt) % VIRTUAL_WIDTH
+    land_scroll = (land_scroll + LAND_SPEED * dt) % VIRTUAL_WIDTH
 
-	gStateMachine:update(dt)
+    gStateMachine:update(dt)
 
-	love.keyboard.keysPressed = {}
+    love.keyboard.keysPressed = {}
 end
 
 function love.draw()
-	push:start()
+    push:start()
 
-	love.graphics.draw(sky_sprite, -sky_scroll, 0)
-	love.graphics.draw(sky_sprite, VIRTUAL_WIDTH - sky_scroll, 0)
+    love.graphics.draw(sky_sprite, -sky_scroll, 0)
+    love.graphics.draw(sky_sprite, VIRTUAL_WIDTH - sky_scroll, 0)
 
-	gStateMachine:render()
+    gStateMachine:render()
 
-	love.graphics.draw(land_sprite, -land_scroll, VIRTUAL_HEIGHT - land_sprite:getHeight())
-	love.graphics.draw(land_sprite, land_sprite:getWidth() - land_scroll, VIRTUAL_HEIGHT - land_sprite:getHeight())
+    love.graphics.draw(land_sprite, -land_scroll, VIRTUAL_HEIGHT - land_sprite:getHeight())
+    love.graphics.draw(land_sprite, land_sprite:getWidth() - land_scroll, VIRTUAL_HEIGHT - land_sprite:getHeight())
 
-	push:finish()
+    push:finish()
 end
